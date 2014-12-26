@@ -15,10 +15,35 @@
 
 #import "NSString+NXOAuth2.h"
 
-
 @implementation NXOAuth2AccessToken
 
 #pragma mark Lifecycle
+
++ (instancetype)tokenWithURLFragment:(NSString*)fragment tokenType:(NSString *)tokenType {
+  NSDictionary *queryParams = [fragment nxoauth2_parametersFromEncodedQueryString];
+  NSString *expiresIn = [queryParams objectForKey:@"expires_in"];
+  NSString *anAccessToken = [queryParams objectForKey:@"access_token"];
+  NSString *aRefreshToken = [queryParams objectForKey:@"refresh_token"];
+  NSString *scopeString = [queryParams objectForKey:@"scope"];
+  if ([queryParams objectForKey:@"token_type"]) {
+    tokenType = [queryParams objectForKey:@"token_type"];
+  }
+  NSSet *scope = nil;
+  if (scopeString && ![scopeString isEqual:[NSNull null]]) {
+    scope = [NSSet setWithArray:[scopeString componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
+  }
+
+  NSDate *expiryDate = nil;
+  if (expiresIn != nil && [expiresIn isKindOfClass:[NSNull class]] == NO) {
+    expiryDate = [NSDate dateWithTimeIntervalSinceNow:[expiresIn integerValue]];
+  }
+  return [[[self class] alloc] initWithAccessToken:anAccessToken
+                                      refreshToken:aRefreshToken
+                                         expiresAt:expiryDate
+                                             scope:scope
+                                      responseBody:fragment
+                                         tokenType:tokenType];
+}
 
 + (instancetype)tokenWithResponseBody:(NSString *)theResponseBody;
 {

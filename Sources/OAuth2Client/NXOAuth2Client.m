@@ -256,7 +256,17 @@ NSString * const NXOAuth2ClientConnectionContextTokenRefresh = @"tokenRefresh";
         [self requestTokenWithAuthGrant:accessGrant redirectURL:[URL nxoauth2_URLWithoutQueryString]];
         return YES;
     }
-    
+
+  NSString* fragment = URL.fragment;
+  if (fragment && [fragment rangeOfString:@"access_token"].location != NSNotFound) {
+    NXOAuth2AccessToken *newToken = [NXOAuth2AccessToken tokenWithURLFragment:fragment tokenType:self.tokenType];
+    if (newToken) {
+      [newToken restoreWithOldToken:self.accessToken];
+      self.accessToken = newToken;
+      return YES;
+    }
+  }
+
     NSString *errorString = [URL nxoauth2_valueForQueryParameterKey:@"error"];
     if (errorString) {
         NSInteger errorCode = 0;

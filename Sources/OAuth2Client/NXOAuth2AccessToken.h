@@ -33,6 +33,7 @@
 @property (nonatomic, readonly) NSSet *scope;
 @property (nonatomic, readonly) NSString *responseBody;
 
++ (instancetype)tokenWithURLFragment:(NSString*)fragment tokenType:(NSString *)tokenType;
 + (instancetype)tokenWithResponseBody:(NSString *)responseBody;
 
 + (instancetype)tokenWithResponseBody:(NSString *)responseBody
