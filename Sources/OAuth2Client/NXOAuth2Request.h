@@ -37,6 +37,14 @@
   sendProgressHandler:(NXOAuth2ConnectionSendingProgressHandler)progressHandler
       responseHandler:(NXOAuth2ConnectionResponseHandler)responseHandler;
 
++ (void)performMethod:(NSString *)aMethod
+           onResource:(NSURL *)aResource
+      usingParameters:(NSDictionary *)someParameters
+            usingBody:(NSData*)body
+         withBodyType:(NSString*)type
+          withAccount:(NXOAuth2Account *)anAccount
+  sendProgressHandler:(NXOAuth2ConnectionSendingProgressHandler)progressHandler
+      responseHandler:(NXOAuth2ConnectionResponseHandler)responseHandler;
 
 #pragma mark Lifecycle
 
@@ -52,7 +60,8 @@
 @property (nonatomic, strong, readwrite) NSString *requestMethod;
 @property (nonatomic, strong, readwrite) NSURL *resource;
 @property (nonatomic, strong, readwrite) NSDictionary *parameters;
-
+@property (nonatomic, strong, readwrite) NSData *body;
+@property (nonatomic, strong, readwrite) NSString *bodyType;
 
 #pragma mark Signed NSURLRequest
 

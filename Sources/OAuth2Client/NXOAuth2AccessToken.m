@@ -37,12 +37,14 @@
   if (expiresIn != nil && [expiresIn isKindOfClass:[NSNull class]] == NO) {
     expiryDate = [NSDate dateWithTimeIntervalSinceNow:[expiresIn integerValue]];
   }
+  NSString* instanceURL = [queryParams objectForKey:@"instance_url"];
   return [[[self class] alloc] initWithAccessToken:anAccessToken
                                       refreshToken:aRefreshToken
                                          expiresAt:expiryDate
                                              scope:scope
                                       responseBody:fragment
-                                         tokenType:tokenType];
+                                         tokenType:tokenType
+                                       instanceURL:instanceURL];
 }
 
 + (instancetype)tokenWithResponseBody:(NSString *)theResponseBody;
@@ -95,47 +97,23 @@
     if (expiresIn != nil && [expiresIn isKindOfClass:[NSNull class]] == NO) {
         expiryDate = [NSDate dateWithTimeIntervalSinceNow:[expiresIn integerValue]];
     }
+    NSString* instanceURL = [jsonDict objectForKey:@"instance_url"];
     return [[[self class] alloc] initWithAccessToken:anAccessToken
                                         refreshToken:aRefreshToken
                                            expiresAt:expiryDate
                                                scope:scope
                                         responseBody:theResponseBody
-                                           tokenType:tokenType];
+                                           tokenType:tokenType
+                                         instanceURL:instanceURL];
 }
 
-- (instancetype)initWithAccessToken:(NSString *)anAccessToken;
-{
-    return [self initWithAccessToken:anAccessToken refreshToken:nil expiresAt:nil];
-}
-
-- (instancetype)initWithAccessToken:(NSString *)anAccessToken refreshToken:(NSString *)aRefreshToken expiresAt:(NSDate *)anExpiryDate;
-{
-    return [[[self class] alloc] initWithAccessToken:anAccessToken
-                                        refreshToken:aRefreshToken
-                                           expiresAt:anExpiryDate
-                                               scope:nil];
-}
-
-- (instancetype)initWithAccessToken:(NSString *)anAccessToken refreshToken:(NSString *)aRefreshToken expiresAt:(NSDate *)anExpiryDate scope:(NSSet *)aScope;
-{
-    return [[[self class] alloc] initWithAccessToken:anAccessToken
-                                        refreshToken:aRefreshToken
-                                           expiresAt:anExpiryDate
-                                               scope:aScope
-                                        responseBody:nil];
-}
-
-- (instancetype)initWithAccessToken:(NSString *)anAccessToken refreshToken:(NSString *)aRefreshToken expiresAt:(NSDate *)anExpiryDate scope:(NSSet *)aScope responseBody:(NSString *)aResponseBody;
-{
-    return [[[self class] alloc] initWithAccessToken:anAccessToken
-                                        refreshToken:aRefreshToken
-                                           expiresAt:anExpiryDate
-                                               scope:aScope
-                                        responseBody:aResponseBody
-                                           tokenType:nil];
-}
-
-- (instancetype)initWithAccessToken:(NSString *)anAccessToken refreshToken:(NSString *)aRefreshToken expiresAt:(NSDate *)anExpiryDate scope:(NSSet *)aScope responseBody:(NSString *)aResponseBody tokenType:(NSString *)aTokenType
+- (instancetype)initWithAccessToken:(NSString *)anAccessToken
+                       refreshToken:(NSString *)aRefreshToken
+                          expiresAt:(NSDate *)anExpiryDate
+                              scope:(NSSet *)aScope
+                       responseBody:(NSString *)aResponseBody
+                          tokenType:(NSString *)aTokenType
+                        instanceURL:(NSString*)aInstanceURL
 {
     // a token object without an actual token is not what we want!
     NSAssert1(anAccessToken, @"No token from token response: %@", aResponseBody);
@@ -151,6 +129,7 @@
         scope        = aScope ? [aScope copy] : [[NSSet alloc] init];
         responseBody = [aResponseBody copy];
         tokenType    = [aTokenType copy];
+        instanceURL  = [aInstanceURL copy];
     }
     return self;
 }
@@ -171,6 +150,7 @@
 @synthesize scope;
 @synthesize responseBody;
 @synthesize tokenType;
+@synthesize instanceURL;
 
 - (NSString*)tokenType
 {
@@ -214,6 +194,9 @@
     if (tokenType) {
         [aCoder encodeObject:tokenType forKey:@"tokenType"];
     }
+    if (instanceURL) {
+        [aCoder encodeObject:instanceURL forKey:@"instanceURL"];
+    }
 }
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder
@@ -233,6 +216,7 @@
         scope = [[aDecoder decodeObjectForKey:@"scope"] copy];
         responseBody = [[aDecoder decodeObjectForKey:@"responseBody"] copy];
         tokenType = [[aDecoder decodeObjectForKey:@"tokenType"] copy];
+        instanceURL = [[aDecoder decodeObjectForKey:@"instanceURL"] copy];
     }
     return self;
 }

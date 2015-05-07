@@ -23,6 +23,7 @@
     NSDate *expiresAt;
     NSSet *scope;
     NSString *responseBody;
+    NSString *instanceURL;
 }
 @property (nonatomic, readonly) NSString *accessToken;
 @property (nonatomic, readonly) NSString *refreshToken;
@@ -32,6 +33,7 @@
 @property (nonatomic, readonly) BOOL hasExpired;
 @property (nonatomic, readonly) NSSet *scope;
 @property (nonatomic, readonly) NSString *responseBody;
+@property (nonatomic, readonly) NSString *instanceURL;
 
 + (instancetype)tokenWithURLFragment:(NSString*)fragment tokenType:(NSString *)tokenType;
 + (instancetype)tokenWithResponseBody:(NSString *)responseBody;
@@ -39,29 +41,13 @@
 + (instancetype)tokenWithResponseBody:(NSString *)responseBody
                             tokenType:(NSString *)tokenType;
 
-- (instancetype)initWithAccessToken:(NSString *)accessToken;
-
-- (instancetype)initWithAccessToken:(NSString *)accessToken
-                       refreshToken:(NSString *)refreshToken
-                          expiresAt:(NSDate *)expiryDate;
-
-- (instancetype)initWithAccessToken:(NSString *)accessToken
-                       refreshToken:(NSString *)refreshToken
-                          expiresAt:(NSDate *)expiryDate
-                              scope:(NSSet *)scope;
-
-- (instancetype)initWithAccessToken:(NSString *)accessToken
-                       refreshToken:(NSString *)refreshToken
-                          expiresAt:(NSDate *)expiryDate
-                              scope:(NSSet *)scope
-                       responseBody:(NSString *)responseBody;
-
 - (instancetype)initWithAccessToken:(NSString *)accessToken
                        refreshToken:(NSString *)refreshToken
                           expiresAt:(NSDate *)expiryDate
                               scope:(NSSet *)scope
                        responseBody:(NSString *)responseBody
-                          tokenType:(NSString*)tokenType; // designated
+                          tokenType:(NSString*)tokenType
+                        instanceURL:(NSString*)instance; // designated
 
 - (void)restoreWithOldToken:(NXOAuth2AccessToken *)oldToken;
 

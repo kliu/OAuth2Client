@@ -48,6 +48,24 @@
     [request performRequestWithSendingProgressHandler:progressHandler responseHandler:responseHandler];
 }
 
++ (void)performMethod:(NSString *)aMethod
+           onResource:(NSURL *)aResource
+      usingParameters:(NSDictionary *)someParameters
+            usingBody:(NSData*)body
+         withBodyType:(NSString*)type
+          withAccount:(NXOAuth2Account *)anAccount
+  sendProgressHandler:(NXOAuth2ConnectionSendingProgressHandler)progressHandler
+      responseHandler:(NXOAuth2ConnectionResponseHandler)responseHandler;
+{
+  NXOAuth2Request *request = [[NXOAuth2Request alloc] initWithResource:aResource
+                                                                method:aMethod
+                                                            parameters:someParameters];
+  request.body = body;
+  request.bodyType = type;
+  request.account = anAccount;
+  [request performRequestWithSendingProgressHandler:progressHandler responseHandler:responseHandler];
+}
+
 
 #pragma mark Lifecycle
 
@@ -71,14 +89,15 @@
 @synthesize account;
 @synthesize connection;
 @synthesize me;
-
+@synthesize body;
+@synthesize bodyType;
 
 #pragma mark Signed NSURLRequest
 
 - (NSURLRequest *)signedURLRequest;
 {
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:self.resource];
-    
+
     [request setHTTPMethod:self.requestMethod];
     
     [self applyParameters:self.parameters onRequest:request];
@@ -105,6 +124,13 @@
     
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:self.resource];
     [request setHTTPMethod:self.requestMethod];
+    if (self.body) {
+        [request setHTTPBody:self.body];
+        [request setValue:[NSString stringWithFormat:@"%@",@([self.body length])] forHTTPHeaderField:@"Content-Length"];
+    }
+    if (self.bodyType) {
+        [request setValue:self.bodyType forHTTPHeaderField:@"Content-Type"];
+    }
     self.connection = [[NXOAuth2Connection alloc] initWithRequest:request
                                                 requestParameters:self.parameters
                                                       oauthClient:self.account.oauthClient
